@@ -43,5 +43,10 @@ describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
         expect(res._isEndCalled()).toBe(true)
         expect(res._getJSONData()).toStrictEqual(errorMessage)
     })
-    
+})
+
+describe('A createRestaurant végponthoz tartozó metódus tesztelése' ()=>{
+    test('Létezik-e a createRestaurant függvény?', ()=>{
+        expect(typeof restaurantController.)
+    })
 })
