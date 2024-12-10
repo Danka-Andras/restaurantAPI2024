@@ -11,12 +11,13 @@ const getAllRestaurants = async (req, res, next) => {
             } 
         else{ res.status(500).json({ message: error.message }) }
     }
-},
+};
 
-exports createRestaurant = async(req, res, next) => {
+const createRestaurant = async(req, res, next) => {
     const ettermek = await restaurantModel.find()
 }
 
 module.exports = {
-    getAllRestaurants
+    getAllRestaurants,
+    createRestaurant
 }

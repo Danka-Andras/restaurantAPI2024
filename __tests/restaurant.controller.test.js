@@ -45,8 +45,8 @@ describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
     })
 })
 
-describe('A createRestaurant végponthoz tartozó metódus tesztelése' ()=>{
+describe('A createRestaurant végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e a createRestaurant függvény?', ()=>{
-        expect(typeof restaurantController.)
+        expect(typeof restaurantController.createRestaurant).toBe('function')
     })
 })
