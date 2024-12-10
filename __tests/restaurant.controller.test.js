@@ -28,11 +28,20 @@ describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
         expect(res._getJSONData()).toStrictEqual(restaurantlist)
     })
     test('Hiba esetén 500-as kóddal kellene visszatérnie', async ()=>{
-        const errorMessage = { message: 'Error finding restaurants' }
+        const errorMessage = { message: 'Error 500' }
         restaurantModel.find.mockImplementation(() => Promise.reject(errorMessage))
         await restaurantController.getAllRestaurants(req, res, next)
         expect(res.statusCode).toBe(500)
         expect(res._isEndCalled()).toBe(true)
         expect(res._getJSONData()).toStrictEqual(errorMessage)
     })
+    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 400' }
+        restaurantModel.find.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.getAllRestaurants(req, res, next)
+        expect(res.statusCode).toBe(400)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+    
 })
