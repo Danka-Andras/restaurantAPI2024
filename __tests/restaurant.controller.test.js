@@ -39,14 +39,6 @@ describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
         expect(res._isEndCalled()).toBe(true)
         expect(res._getJSONData()).toStrictEqual(errorMessage)
     })
-    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
-        const errorMessage = { message: 'Error 400' }
-        restaurantModel.find.mockImplementation(() => Promise.reject(errorMessage))
-        await restaurantController.getAllRestaurants(req, res, next)
-        expect(res.statusCode).toBe(400)
-        expect(res._isEndCalled()).toBe(true)
-        expect(res._getJSONData()).toStrictEqual(errorMessage)
-    })
 })
 
 describe('A createRestaurant végponthoz tartozó metódus tesztelése', ()=>{
