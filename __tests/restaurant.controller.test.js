@@ -3,14 +3,15 @@ const restaurantController = require('../controllers/restaurant.controller')
 const restaurantModel = require('../models/restaurantModel')
 const restaurantlist = require('./mock-data/allRestaurants.json')
 
-restaurantModel.find = jest.fn()
 let req, res, next
 
-beforeEach(()=>{
-    req = httpMocks.createRequest()
-    res = httpMocks.createResponse()
-    next = null
-})
+beforeEach(() => { 
+    req = httpMocks.createRequest(); 
+    res = httpMocks.createResponse(); 
+    next = null; 
+    restaurantModel.prototype.save = jest.fn().mockResolvedValue(req.body); 
+    restaurantModel.find = jest.fn().mockResolvedValue(restaurantlist); 
+});
 
 describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e a getAllRestaurants függvény?', ()=>{
@@ -48,5 +49,48 @@ describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
 describe('A createRestaurant végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e a createRestaurant függvény?', ()=>{
         expect(typeof restaurantController.createRestaurant).toBe('function')
+    })
+    test('A createRestaurant függvényben meg kellene hívni a model save() függvényét', ()=>{
+        restaurantController.createRestaurant(req, res, next)
+        expect(restaurantModel.prototype.save).toHaveBeenCalled()
+    })
+    test('200-as válasz kódot ad vissza sikeres mentés esetén', async () => { 
+        await restaurantController.createRestaurant(req, res, next); 
+        expect(res.statusCode).toBe(200); 
+        expect(res._getJSONData()).toEqual(req.body); 
+    });
+    test('Hiba esetén 500-as kóddal kellene visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 500' }
+        restaurantModel.prototype.save.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.createRestaurant(req, res, next)
+        expect(res.statusCode).toBe(500)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 400' }
+        restaurantModel.prototype.save.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.createRestaurant(req, res, next)
+        expect(res.statusCode).toBe(400)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+})
+
+describe('A getRestaurantById végponthoz tartozó metódus tesztelése', ()=>{
+    test('Létezik-e a getRestaurantById függvény?', ()=>{
+        expect(typeof restaurantController.getRestaurantById).toBe('function')
+    })
+})
+
+describe('Az updateRestaurant végponthoz tartozó metódus tesztelése', ()=>{
+    test('Létezik-e az updateRestaurant függvény?', ()=>{
+        expect(typeof restaurantController.updateRestaurant).toBe('function')
+    })
+})
+
+describe('A deleteRestaurant végponthoz tartozó metódus tesztelése', ()=>{
+    test('Létezik-e a deleteRestaurant függvény?', ()=>{
+        expect(typeof restaurantController.deleteRestaurant).toBe('function')
     })
 })
