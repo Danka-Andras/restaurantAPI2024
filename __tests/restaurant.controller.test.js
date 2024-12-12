@@ -13,6 +13,7 @@ beforeEach(() => {
     restaurantModel.find = jest.fn().mockResolvedValue(restaurantlist); 
     restaurantModel.findById = jest.fn().mockResolvedValue(req.params.id)
     restaurantModel.update = jest.fn().mockResolvedValue(req.body);
+    restaurantModel.delete = jest.fn().mockResolvedValue(req.params.id)
 });
 
 describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
@@ -143,4 +144,29 @@ describe('A deleteRestaurant végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e a deleteRestaurant függvény?', ()=>{
         expect(typeof restaurantController.deleteRestaurant).toBe('function')
     })
+    test('A deleteRestaurant függvényben meg kellene hívni a model delete() függvényét', ()=>{
+        restaurantController.deleteRestaurant(req, res, next)
+        expect(restaurantModel.delete).toHaveBeenCalled()
+    })
+    test('200-as válasz kódot ad vissza sikeres törlés esetén', async () => { 
+        await restaurantController.deleteRestaurant(req, res, next); 
+        expect(res.statusCode).toBe(200);
+    });
+    test('Hiba esetén 500-as kóddal kellene visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 500' }
+        restaurantModel.delete.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.deleteRestaurant(req, res, next)
+        expect(res.statusCode).toBe(500)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 400' }
+        restaurantModel.delete.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.deleteRestaurant(req, res, next)
+        expect(res.statusCode).toBe(400)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+
 })
