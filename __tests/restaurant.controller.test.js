@@ -11,6 +11,8 @@ beforeEach(() => {
     next = null; 
     restaurantModel.prototype.save = jest.fn().mockResolvedValue(req.body); 
     restaurantModel.find = jest.fn().mockResolvedValue(restaurantlist); 
+    restaurantModel.findById = jest.fn().mockResolvedValue(req.params.id)
+    restaurantModel.update = jest.fn().mockResolvedValue(req.body);
 });
 
 describe('A getAll végponthoz tartozó metódus tesztelése', ()=>{
@@ -81,11 +83,59 @@ describe('A getRestaurantById végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e a getRestaurantById függvény?', ()=>{
         expect(typeof restaurantController.getRestaurantById).toBe('function')
     })
+    test('A getRestaurantById függvényben meg kellene hívni a model findById() függvényét', ()=>{
+        restaurantController.getRestaurantById(req, res, next)
+        expect(restaurantModel.findById).toHaveBeenCalled()
+    })
+    test('200-as válasz kódot ad vissza sikeres találat esetén', async () => { 
+        await restaurantController.getRestaurantById(req, res, next); 
+        expect(res.statusCode).toBe(200);
+    });
+    test('Hiba esetén 500-as kóddal kellene visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 500' }
+        restaurantModel.findById.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.getRestaurantById(req, res, next)
+        expect(res.statusCode).toBe(500)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 400' }
+        restaurantModel.findById.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.getRestaurantById(req, res, next)
+        expect(res.statusCode).toBe(400)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
 })
 
 describe('Az updateRestaurant végponthoz tartozó metódus tesztelése', ()=>{
     test('Létezik-e az updateRestaurant függvény?', ()=>{
         expect(typeof restaurantController.updateRestaurant).toBe('function')
+    })
+    test('Az updateRestaurant függvényben meg kellene hívni a model update() függvényét', ()=>{
+        restaurantController.updateRestaurant(req, res, next)
+        expect(restaurantModel.update).toHaveBeenCalled()
+    })
+    test('200-as válasz kódot ad vissza sikeres frissités esetén', async () => { 
+        await restaurantController.updateRestaurant(req, res, next); 
+        expect(res.statusCode).toBe(200);
+    });
+    test('Hiba esetén 500-as kóddal kellene visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 500' }
+        restaurantModel.update.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.updateRestaurant(req, res, next)
+        expect(res.statusCode).toBe(500)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
+    })
+    test('Felhasználói hiba esetén 400-as kóddal kell visszatérnie', async ()=>{
+        const errorMessage = { message: 'Error 400' }
+        restaurantModel.update.mockImplementation(() => Promise.reject(errorMessage))
+        await restaurantController.updateRestaurant(req, res, next)
+        expect(res.statusCode).toBe(400)
+        expect(res._isEndCalled()).toBe(true)
+        expect(res._getJSONData()).toStrictEqual(errorMessage)
     })
 })
 
