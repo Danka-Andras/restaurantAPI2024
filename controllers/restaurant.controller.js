@@ -62,7 +62,7 @@ const updateRestaurant = async (req, res, next) => {
 const deleteRestaurant = async (req, res, next) => {
     try {
         const deletedRestaurant = await restaurantModel.delete(req.params.id);
-        res.status(200).json({ message: 'Restaurant deleted successfully' });
+        res.status(200).json(deletedRestaurant);
     } catch (error) {
         if (error.message === 'Error 400') {
             res.status(400).json({ message: error.message });
